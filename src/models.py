@@ -13,27 +13,33 @@ class User(Base):
     user_name = Column(String(25), nullable=False)
     email = Column(String(255), nullable=False)
     pass_user = Column(String(40), nullable=False)
+    posts = relationship('Post', back_populates='user')
+    comments = relationship('Comment', back_populates='user')
+    likes = relationship('Like', back_populates='user')
+
+class Comment(Base):
+    __tablename__ = 'comment'
+    comment_id = Column(Integer, primary_key=True)
+    comment_text = Column(String(114))
+    user_id = Column(Integer, ForeignKey('user.user_id'))
+    user = relationship('User', back_populates='comments')
+    post_id = Column(Integer, ForeignKey('post.post_id'))
+    post = relationship('Post', back_populates='comments')
 
 class Post(Base):
     __tablename__ = 'post'
     post_id = Column(Integer, primary_key=True)
     post_text = Column(String(180))
     post_picture = Column(String(255))
-    user_post = Column(Integer, ForeignKey('user.user_id'))
-    user = relationship(User)
-                       
-class Likes(Base):
-    __tablename__ ='likes'
-    like_id = Column(Integer, primary_key=True)
-    like_user = Column(Integer, ForeignKey('user.user_id'))
-    user = relationship(User)
+    user_id = Column(Integer, ForeignKey('user.user_id'))
+    user = relationship('User', back_populates='posts')
+    comments = relationship('Comment', back_populates='post')
 
-class Coment(Base):
-    __tablename__ ='coment'
-    coment_id = Column(Integer, primary_key=True)
-    coment_text = Column(String(114))
-    user_coment = Column(String(114), ForeignKey('user.user_id'))
-    user = relationship(User)
+class Like(Base):
+    __tablename__ = 'like'
+    like_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.user_id'))
+    user = relationship('User', back_populates='likes')
 
 # class Address(Base):
 #     __tablename__ = 'address'
@@ -46,8 +52,8 @@ class Coment(Base):
 #     user_id = Column(Integer, ForeignKey('user.id'))
 #     user = relationship(User)
 
-    def to_dict(self):
-        return {}
+    # def to_dict(self):
+    #     return {}
 
 ## Draw from SQLAlchemy base
 try:
